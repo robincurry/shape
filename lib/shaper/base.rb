@@ -5,43 +5,33 @@ module Shaper
 
     extend ActiveSupport::Concern
 
-    def initialize(*args)
-      super(*args)
-      context[:view] ||= self.class.default_view
-      @data_errors = {}
+    attr_accessor :_source
+    attr_accessor :_parent
+
+    protected :_parent
+
+    def initialize(source = nil, options = {})
+      self._source = source
+      self._parent = options.delete(:parent)
     end
 
-    def href(name = self.source_name.underscore)
-        # NOTE: polymorphic_url doesn't work here for all cases
-        h.send("#{name}_url", self)
-      rescue ActionController::RoutingError
-      # No route exists for the resource. This can happen when the resource
-      # hasn't been persisted yet.
+    def self.included(base)
+      base.class_eval do
+        class << self
+          alias_method :shape, :new
+        end
+      end
     end
 
-    def source_name
-     source.class.name
-    end
-    protected :source_name
-
-    def has_data_errors?
-      !@data_errors.empty?
-    end
-
-    def data_error! (name, exception)
-      #Rails.logger.debug "A data error occurred setting #{name}"
-      #Rails.logger.debug exception
-      @data_errors[name] = exception.message
-    end
-
-    def data_errors
-      @data_errors
-    end
+    #def source_name
+      #_source.class.name
+    #end
+    #protected :source_name
 
     module ClassMethods
 
-      def decorator_context
-        @decorator_context || self
+      def shaper_context
+        @shaper_context || self
       end
 
       # Expose a property as {<property_name>: "..."}
@@ -67,100 +57,49 @@ module Shaper
       #   property :practices, with: PracticeDecorator, context: {view: :summary}
       #
       def property(property_name, options={}, &block)
-        properties[property_name] = Shaper::PropertyDecorator.new(
-          decorator_context, property_name, options, &block
+        properties[property_name] = Shaper::PropertyShaper.new(
+          shaper_context, property_name, options, &block
         )
       end
 
-      # Expose a link as {href: "..."}
-      #
-      # To expose a collection:
-      #
-      #   link :practices
-      #
-      # The decorator exposes a link to the collection as a discreet href
-      # by calling `polymorphic_url(source, collection)`
-      #
-      #   practices: {href: 'http://host/professionals/1/practices'}
-      #
-      # Use :path if the path cannot be inferred by polymorphic_url, e.g.:
-      #
-      #   link :field_specialties, path: :professional_field_specialties
-      #
-      # becomes:
-      #
-      #   field_specialties: {href: 'http://host/professionals/1/field_specialities'}
-      #
-      def link(link_name, options={})
-        links[link_name] = options
-        delegate_property(link_name)
+      def association(association_name, options = {}, &block)
+        associations[association_name] = Shaper::AssocationShaper.new(
+          shaper_context, association_name, options, &block
+        )
       end
 
-
-      # Creates a view that will be used if specified
-      # via the decorator's context.
-      #
-      # Views can contain properties and links::
-      #
-      #   view :with_lat_long do
-      #     property :latitude
-      #     property :longitude
-      #   end
-      #
-      #   view :with_facilities do
-      #     link :facilities
-      #   end
-      #
-      # Views can be composed from other views:
-      #
-      #   view :full do
-      #     view :with_lat_long    # nests with_lat_long view
-      #     view :with_facilities  # nests with_facilities view
-      #   end
-      #
-      # Decorators expose the view that is passed
-      # in to the context:
-      #
-      #   AddressDecorator.new(
-      #     @addresses,
-      #     context: {view: :full})
-      #
-      def view(view_name, options={}, &block)
-        views[view_name] = ViewDecorator.new(decorator_context, view_name, options, &block)
-        if options[:default]
-          self.default_view = view_name
-        end
+      def associations
+        @associations ||= {}
       end
 
       def properties
         @properties ||= {}
       end
 
-      def links
-        @links ||= {}
+      # @overload delegate(*methods, options = {})
+      #   Overrides {http://api.rubyonrails.org/classes/Module.html#method-i-delegate Module.delegate}
+      #   to make `:_source` the default delegation target.
+      #
+      #   @return [void]
+      def delegate(*methods)
+        options = methods.extract_options!
+        super *methods, options.reverse_merge(to: :_source)
       end
 
-      def views
-        @views ||= {}
-      end
-
-      def default_view
-        @default_view
-      end
-
-      def default_view=(v)
-        @default_view = v
-      end
-
-    private
-
-      def delegate_property(name)
-        if !decorator_context.method_defined?(name)
-          decorator_context.delegate(name) if decorator_context.respond_to?(name)
-          decorator_context.delegate("#{name}=") if decorator_context.respond_to?("#{name}=")
+      def shape_collection(collection, options = {})
+        Array(collection).map do |item|
+          self.shape(item, options.clone)
         end
       end
-    end
 
+    protected
+      def delegate_property(name)
+        if !shaper_context.method_defined?(name)
+          shaper_context.delegate(name)
+          shaper_context.send(:protected, name)
+        end
+      end
+
+    end
   end
 end
