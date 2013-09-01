@@ -3,13 +3,12 @@ module Shaper
     include Shaper::DataVisitor
 
     def as_json(*args)
-      Rack::MiniProfiler.step("Shaper::Renderers#as_json") do
-        visit(lambda {|x| x.as_json})
-      end
+      visit(lambda {|x| x.as_json})
     end
 
     def to_hash(*args)
       visit
     end
+    alias_method :to_h, :to_hash
   end
 end

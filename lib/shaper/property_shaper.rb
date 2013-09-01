@@ -19,8 +19,6 @@ module Shaper
   #     end
   #     property :city
   #     # ...
-  #
-  #     link :facilities
   #   end
   class PropertyShaper
     include Shaper::Base::ClassMethods
