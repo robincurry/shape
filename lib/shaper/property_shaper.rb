@@ -50,7 +50,15 @@ module Shaper
     def define_accessor(name, source_name)
       if !shaper_context.method_defined?(name.to_sym)
         self.from do
+          begin
           _source.send(source_name)
+          rescue NoMethodError
+            if _source.respond_to?(:[])
+              _source.send(:[], source_name)
+            else
+              raise
+            end
+          end
         end
       end
     end
