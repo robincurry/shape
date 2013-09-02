@@ -10,7 +10,7 @@ module Shaper
   protected
 
     def properties_to_visit
-      self.class.properties
+      self.class.properties.merge(self.properties)
     end
 
     def data_visitor(properties = self.properties_to_visit, visitor = lambda {|x| x})

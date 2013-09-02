@@ -13,20 +13,31 @@ module Shaper
     def initialize(source = nil, options = {})
       self._source = source
       self._parent = options.delete(:parent)
-    end
-
-    def self.included(base)
-      base.class_eval do
-        class << self
-          alias_method :shape, :new
-        end
-      end
+      self.delegate_properties_from
     end
 
     #def source_name
       #_source.class.name
     #end
     #protected :source_name
+    #
+
+    protected
+
+    def delegate_properties_from
+      self.class._properties_from.each do |from, except|
+        Array(_source.send(from)).each do |name|
+          unless except.include?(name.to_sym)
+            property(name) do
+              from do
+                _source.send(:[], name)
+              end
+            end
+          end
+        end
+      end
+    end
+
 
     module ClassMethods
 
@@ -66,6 +77,11 @@ module Shaper
         )
       end
 
+      def properties_from(name, options={})
+        except = Array(options[:except])
+        _properties_from << [name, except]
+      end
+
       def association(association_name, options = {}, &block)
         associations[association_name] = Shaper::AssocationShaper.new(
           shaper_context, association_name, options, &block
@@ -78,6 +94,10 @@ module Shaper
 
       def properties
         @properties ||= {}
+      end
+
+      def _properties_from
+        @properties_from ||= []
       end
 
       # @overload delegate(*methods, options = {})
@@ -104,6 +124,12 @@ module Shaper
         end
       end
 
+
+    end
+    # Allows properties to be added in an instance..
+    include ClassMethods
+    def shaper_context
+      @shaper_context || self.class
     end
   end
 end

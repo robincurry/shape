@@ -42,7 +42,9 @@ module Shaper
     end
 
     def from(&block)
-      shaper_context.send(:define_method, name, &block)
+      unless shaper_context.method_defined?(name.to_sym)
+        shaper_context.send(:define_method, name, &block)
+      end
     end
 
     protected
@@ -53,6 +55,8 @@ module Shaper
           begin
           _source.send(source_name)
           rescue NoMethodError
+            # If source doesn't have a corresponding method, try accessing it
+            # via element accessor.
             if _source.respond_to?(:[])
               _source.send(:[], source_name)
             else

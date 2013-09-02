@@ -167,7 +167,51 @@ describe Shaper::Base do
 
     end
 
+    context 'and a Shaper decorator with properties_from' do
 
+      before do
+        stub_const('MockDecorator', Class.new do
+          include Shaper::Base
+          properties_from(:keys)
+        end)
+
+      end
+
+      context 'when shaped by the decorator' do
+
+        subject {
+          MockDecorator.new(source)
+        }
+
+        it 'exposes defined properties from source for each key' do
+          expect(subject).to respond_to(:name, :age, :ssn, :children)
+          expect(subject.name).to eq('John Smith')
+        end
+      end
+
+    end
+
+    context 'and a Shaper decorator with properties_from with an except list' do
+
+      before do
+        stub_const('MockDecorator', Class.new do
+          include Shaper::Base
+          properties_from(:keys, except: :ssn)
+        end)
+      end
+
+      context 'when shaped by the decorator' do
+
+        subject {
+          MockDecorator.new(source)
+        }
+
+        it 'should not expose defined properties for the exceptions' do
+          expect(subject).to_not respond_to(:ssn)
+        end
+      end
+
+    end
   end
 
 end
