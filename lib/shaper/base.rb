@@ -30,6 +30,10 @@ module Shaper
 
     module ClassMethods
 
+      def shape(source, options={})
+        self.new(source, options)
+      end
+
       def shaper_context
         @shaper_context || self
       end
