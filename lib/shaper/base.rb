@@ -83,7 +83,7 @@ module Shaper
       end
 
       def association(association_name, options = {}, &block)
-        associations[association_name] = Shaper::AssocationShaper.new(
+        associations[association_name] = Shaper::AssociationShaper.new(
           shaper_context, association_name, options, &block
         )
       end
