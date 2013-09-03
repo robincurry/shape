@@ -51,17 +51,28 @@ module Shaper
 
     def define_accessor(name, source_name)
       if !shaper_context.method_defined?(name.to_sym)
+        _options = self.options
         self.from do
-          begin
-          _source.send(source_name)
-          rescue NoMethodError
-            # If source doesn't have a corresponding method, try accessing it
-            # via element accessor.
-            if _source.respond_to?(:[])
-              _source.send(:[], source_name)
+          return nil unless _source
+          result = begin
+            _source.send(source_name)
+            rescue NoMethodError
+              # If source doesn't have a corresponding method, try accessing it
+              # via element accessor.
+              if _source.respond_to?(:[])
+                _source.send(:[], source_name)
+              else
+                raise
+              end
+          end
+          if with = _options[:with]
+            if result.respond_to?(:join)
+              with.shape_collection(result, parent: self)
             else
-              raise
+              with.shape(result, parent: self)
             end
+          else
+            result
           end
         end
       end

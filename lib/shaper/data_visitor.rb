@@ -2,9 +2,7 @@ module Shaper
   module DataVisitor
 
     def visit(visitor = lambda {|x| x})
-      data_visitor(properties_to_visit, visitor).merge!(
-        association_visitor(self.class.associations, visitor)
-      )
+      data_visitor(properties_to_visit, visitor)
     end
 
   protected
@@ -15,21 +13,17 @@ module Shaper
 
     def data_visitor(properties = self.properties_to_visit, visitor = lambda {|x| x})
       properties.each_with_object({}) do |(name, property), obj|
-        obj[name] = visitor.call(self.send(name))
-      end
-    end
-
-    def association_visitor(associations = self.class.associations, visitor = lambda {|x| x})
-      associations.each_with_object({}) do |(name, property), obj|
-        association = self.send(name)
-        obj[name] = if association.respond_to?(:visit)
-          association.visit(visitor)
-        elsif association.respond_to?(:map)
-          association.each_with_object([]) do |item, results|
-            if item.respond_to?(:visit) and visited = item.visit(visitor) and !visited.blank?
-              results << visited
+        if property.options.present? && property.options[:with]
+          result = self.send(name)
+          if result.respond_to?(:visit)
+            obj[name] = result.visit(visitor)
+          elsif result.is_a?(Enumerable)
+            obj[name] = result.each_with_object([]) do |item, results|
+              results << item.visit(visitor)
             end
           end
+        else
+          obj[name] = visitor.call(self.send(name))
         end
       end
     end

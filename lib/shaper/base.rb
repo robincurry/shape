@@ -76,16 +76,11 @@ module Shaper
           shaper_context, property_name, options, &block
         )
       end
+      alias_method :association, :property
 
       def properties_from(name, options={})
         except = Array(options[:except])
         _properties_from << [name, except]
-      end
-
-      def association(association_name, options = {}, &block)
-        associations[association_name] = Shaper::AssociationShaper.new(
-          shaper_context, association_name, options, &block
-        )
       end
 
       def associations
