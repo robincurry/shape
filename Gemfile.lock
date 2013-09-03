@@ -20,6 +20,7 @@ GEM
       thread_safe (~> 0.1)
       tzinfo (~> 0.3.37)
     atomic (1.1.13)
+    awesome_print (1.1.0)
     builder (3.1.4)
     diff-lcs (1.2.4)
     erubis (2.7.0)
@@ -59,6 +60,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  awesome_print
   rspec
   rspec-rails
   shaper!
