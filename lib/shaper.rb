@@ -1,3 +1,4 @@
+require 'version'
 require 'active_support/all'
 require 'shaper/base'
 require 'shaper/property_shaper'
