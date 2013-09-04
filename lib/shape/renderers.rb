@@ -1,6 +1,6 @@
-module Shaper
+module Shape
   module Renderers
-    include Shaper::DataVisitor
+    include Shape::DataVisitor
 
     def as_json(*args)
       visit(lambda {|x| x.as_json})

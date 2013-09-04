@@ -1,6 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 
-describe Shaper::PropertyShaper do
+describe Shape::PropertyShaper do
 
   context 'Given an object with method attributes' do
 
@@ -20,11 +20,11 @@ describe Shaper::PropertyShaper do
       end
     }
 
-    context 'and a Shaper decorator' do
+    context 'and a Shape decorator' do
 
       before do
         stub_const('MockDecorator', Class.new do
-          include Shaper::Base
+          include Shape::Base
           property :name
           property :years_of_age, from: :age
         end)
@@ -72,11 +72,11 @@ describe Shaper::PropertyShaper do
       }
     end
 
-    context 'and a Shaper decorator' do
+    context 'and a Shape decorator' do
 
       before do
         stub_const('MockDecorator', Class.new do
-          include Shaper::Base
+          include Shape::Base
           property :name
           property :years_of_age, from: :age
         end)
@@ -105,16 +105,16 @@ describe Shaper::PropertyShaper do
 
     end
 
-    context 'and a Shaper decorator with property with:' do
+    context 'and a Shape decorator with property with:' do
 
       before do
         stub_const('ChildDecorator', Class.new do
-          include Shaper::Base
+          include Shape::Base
           property :name
         end)
 
         stub_const('MockDecorator', Class.new do
-          include Shaper::Base
+          include Shape::Base
           property :children, with: ChildDecorator
         end)
 

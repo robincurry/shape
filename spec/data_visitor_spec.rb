@@ -1,13 +1,13 @@
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 
-describe Shaper::DataVisitor do
+describe Shape::DataVisitor do
 
-  context 'Given a decorated class that implements Shaper::DataVisitor' do
+  context 'Given a decorated class that implements Shape::DataVisitor' do
 
     before do
       stub_const('PersonDecorator', Class.new do
-        include Shaper::Base
-        include Shaper::DataVisitor
+        include Shape::Base
+        include Shape::DataVisitor
         property :name
         property :age
         association :spouse, with: self

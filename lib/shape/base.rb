@@ -1,6 +1,6 @@
 require 'active_support/concern'
 
-module Shaper
+module Shape
   module Base
 
     extend ActiveSupport::Concern
@@ -72,7 +72,7 @@ module Shaper
       #   property :practices, with: PracticeDecorator, context: {view: :summary}
       #
       def property(property_name, options={}, &block)
-        properties[property_name] = Shaper::PropertyShaper.new(
+        properties[property_name] = Shape::PropertyShaper.new(
           shaper_context, property_name, options, &block
         )
       end

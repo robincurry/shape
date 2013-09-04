@@ -1,4 +1,4 @@
-module Shaper
+module Shape
   # = View Decorator
   # Allows for creating different, composable
   # decorator views
@@ -35,7 +35,7 @@ module Shaper
   #
   #
   class ViewDecorator
-    include Shaper::Base::ClassMethods
+    include Shape::Base::ClassMethods
     attr_accessor :name
     attr_accessor :decorator_context
     attr_accessor :options

@@ -1,4 +1,4 @@
-module Shaper
+module Shape
   # = Property Shaper
   # Keeps track of property info and context
   # when shaping shaper views.
@@ -8,7 +8,7 @@ module Shaper
   #
   # Allows anything inside a property block
   # to call methods in the context of the
-  # Shaper dsl allowing for nested properties.
+  # Shape dsl allowing for nested properties.
   #
   # Example:
   #
@@ -21,7 +21,7 @@ module Shaper
   #     # ...
   #   end
   class PropertyShaper
-    include Shaper::Base::ClassMethods
+    include Shape::Base::ClassMethods
 
     attr_accessor :name
     attr_accessor :shaper_context

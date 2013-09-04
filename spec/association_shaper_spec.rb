@@ -20,16 +20,16 @@ describe "Property child associations" do
       end
     }
 
-    context 'and Parent and Child Shaper decorators' do
+    context 'and Parent and Child Shape decorators' do
 
       before do
         stub_const('ChildDecorator', Class.new do
-          include Shaper::Base
+          include Shape::Base
           property :name
         end)
 
         stub_const('ParentDecorator', Class.new do
-          include Shaper::Base
+          include Shape::Base
           property :name
           property :years_of_age, from: :age
 
@@ -72,16 +72,16 @@ describe "Property child associations" do
     }
 
 
-    context 'and Parent and Child Shaper decorators' do
+    context 'and Parent and Child Shape decorators' do
 
       before do
         stub_const('ChildDecorator', Class.new do
-          include Shaper::Base
+          include Shape::Base
           property :legal_name, from: :name
         end)
 
         stub_const('ParentDecorator', Class.new do
-          include Shaper::Base
+          include Shape::Base
           property :name
           property :years_of_age, from: :age
 
@@ -140,22 +140,22 @@ describe "Property child associations" do
     }
 
 
-    context 'and Parent and Child Shaper decorators' do
+    context 'and Parent and Child Shape decorators' do
 
       before do
         stub_const('NestedChildDecorator', Class.new do
-          include Shaper::Base
+          include Shape::Base
           property :name
         end)
 
         stub_const('ChildDecorator', Class.new do
-          include Shaper::Base
+          include Shape::Base
           property :legal_name, from: :name
           association :children, with: NestedChildDecorator
         end)
 
         stub_const('ParentDecorator', Class.new do
-          include Shaper::Base
+          include Shape::Base
           property :name
           property :years_of_age, from: :age
 

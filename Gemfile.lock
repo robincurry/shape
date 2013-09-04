@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    shaper (0.0.1)
+    shape (0.0.1)
       activesupport (>= 3.0)
 
 GEM
@@ -63,4 +63,4 @@ DEPENDENCIES
   awesome_print
   rspec
   rspec-rails
-  shaper!
+  shape!

@@ -1,4 +1,4 @@
-module Shaper
+module Shape
   module DataVisitor
 
     def visit(visitor = lambda {|x| x})

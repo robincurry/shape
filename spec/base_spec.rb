@@ -1,6 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 
-describe Shaper::Base do
+describe Shape::Base do
 
   context 'Given an object with method attributes' do
 
@@ -20,11 +20,11 @@ describe Shaper::Base do
       end
     }
 
-    context 'and a Shaper decorator' do
+    context 'and a Shape decorator' do
 
       before do
         stub_const('MockDecorator', Class.new do
-          include Shaper::Base
+          include Shape::Base
           property :name
           property :years_of_age, from: :age
         end)
@@ -52,16 +52,16 @@ describe Shaper::Base do
       end
     end
 
-    context 'and Parent and Child Shaper decorators' do
+    context 'and Parent and Child Shape decorators' do
 
       before do
         stub_const('ChildDecorator', Class.new do
-          include Shaper::Base
+          include Shape::Base
           property :name
         end)
 
         stub_const('ParentDecorator', Class.new do
-          include Shaper::Base
+          include Shape::Base
           property :name
           property :years_of_age, from: :age
 
@@ -103,11 +103,11 @@ describe Shaper::Base do
       }
     }
 
-    context 'and a Shaper decorator' do
+    context 'and a Shape decorator' do
 
       before do
         stub_const('MockDecorator', Class.new do
-          include Shaper::Base
+          include Shape::Base
           property :name
           property :years_of_age, from: :age
         end)
@@ -136,16 +136,16 @@ describe Shaper::Base do
 
     end
 
-    context 'and Parent and Child Shaper decorators' do
+    context 'and Parent and Child Shape decorators' do
 
       before do
         stub_const('ChildDecorator', Class.new do
-          include Shaper::Base
+          include Shape::Base
           property :legal_name, from: :name
         end)
 
         stub_const('ParentDecorator', Class.new do
-          include Shaper::Base
+          include Shape::Base
           property :name
           property :years_of_age, from: :age
 
@@ -167,11 +167,11 @@ describe Shaper::Base do
 
     end
 
-    context 'and a Shaper decorator with properties_from' do
+    context 'and a Shape decorator with properties_from' do
 
       before do
         stub_const('MockDecorator', Class.new do
-          include Shaper::Base
+          include Shape::Base
           properties_from(:keys)
         end)
 
@@ -191,11 +191,11 @@ describe Shaper::Base do
 
     end
 
-    context 'and a Shaper decorator with properties_from with an except list' do
+    context 'and a Shape decorator with properties_from with an except list' do
 
       before do
         stub_const('MockDecorator', Class.new do
-          include Shaper::Base
+          include Shape::Base
           properties_from(:keys, except: :ssn)
         end)
       end

@@ -1,3 +1,3 @@
-module Shaper
+module Shape
   VERSION = '0.0.1'
 end
