@@ -1,5 +1,5 @@
-require 'version'
 require 'active_support/all'
+require 'shaper/version'
 require 'shaper/base'
 require 'shaper/property_shaper'
 require 'shaper/data_visitor'
