@@ -1,7 +1,7 @@
 module Shape
   # = Property Shaper
   # Keeps track of property info and context
-  # when shaping shaper views.
+  # when shaping views.
   #
   # We'll use the PropertyShaper objects
   # later to recursively build the data.
@@ -45,6 +45,14 @@ module Shape
       unless shaper_context.method_defined?(name.to_sym)
         shaper_context.send(:define_method, name, &block)
       end
+    end
+
+    def with(&block)
+      options[:with] = Class.new do
+        include Shape
+        instance_eval(&block)
+      end
+      define_accessor(name, options[:from] || name)
     end
 
     protected
