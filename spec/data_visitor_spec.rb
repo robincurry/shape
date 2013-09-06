@@ -86,6 +86,7 @@ describe Shape::DataVisitor do
         }
 
         it 'returns the raw visited data' do
+          expect(subject).to include(:spouse)
           expect(subject[:spouse]).to eq(nil)
           expect(subject[:children]).to eq([])
         end
@@ -99,6 +100,7 @@ describe Shape::DataVisitor do
         }
 
         it 'returns the raw visited data' do
+          expect(subject).to include(:spouse)
           expect(subject[:spouse]).to eq(nil)
           expect(subject[:children]).to eq([])
         end
