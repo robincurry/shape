@@ -21,6 +21,8 @@ module Shape
             obj[name] = result.each_with_object([]) do |item, results|
               results << item.visit(visitor)
             end
+          else
+            obj[name] = property.options[:with] ? nil : []
           end
         else
           obj[name] = visitor.call(self.send(name))
