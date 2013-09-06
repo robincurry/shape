@@ -6,24 +6,27 @@ describe "Property child associations" do
 
     let(:source) {
       OpenStruct.new.tap do |person|
-      person.name  = 'John Smith'
-      person.age   = 34
-      person.ssn   = 123456789
-      person.children = [
-        OpenStruct.new.tap do |child|
-        child.name  = 'Jimmy Smith'
-        end,
+        person.name  = 'John Smith'
+        person.age   = 34
+        person.ssn   = 123456789
+        person.children = [
           OpenStruct.new.tap do |child|
-          child.name  = 'Jane Smith'
+            child.name  = 'Jimmy Smith'
           end,
-      ]
+          OpenStruct.new.tap do |child|
+            child.name  = 'Jane Smith'
+          end
+        ]
+        person.spouse = OpenStruct.new.tap do |spouse|
+          spouse.name  = 'Sally Smith'
+        end
       end
     }
 
-    context 'and Parent and Child Shape decorators' do
+    context 'and Parent and FamilyMember Shape decorators' do
 
       before do
-        stub_const('ChildDecorator', Class.new do
+        stub_const('FamilyMember', Class.new do
           include Shape::Base
           property :name
         end)
@@ -33,7 +36,8 @@ describe "Property child associations" do
           property :name
           property :years_of_age, from: :age
 
-          association :children, with: ChildDecorator
+          association :children, each_with: FamilyMember
+          association :spouse,   with: FamilyMember
         end)
       end
 
@@ -42,6 +46,10 @@ describe "Property child associations" do
         subject {
           ParentDecorator.new(source)
         }
+
+        it 'exposes and shapes spouse association' do
+          expect(subject.spouse.name).to eq('Sally Smith')
+        end
 
         it 'exposes and shapes children associations' do
           expect(subject.children.map(&:name)).to eq(['Jimmy Smith', 'Jane Smith'])
@@ -67,15 +75,18 @@ describe "Property child associations" do
           {
             name: 'Jane Smith'
           }
-        ]
+        ],
+        spouse: {
+          name: 'Sally Smith'
+        }
       }
     }
 
 
-    context 'and Parent and Child Shape decorators' do
+    context 'and Parent and FamilyMember Shape decorators' do
 
       before do
-        stub_const('ChildDecorator', Class.new do
+        stub_const('FamilyMember', Class.new do
           include Shape::Base
           property :legal_name, from: :name
         end)
@@ -85,7 +96,8 @@ describe "Property child associations" do
           property :name
           property :years_of_age, from: :age
 
-          association :children, with: ChildDecorator
+          association :children, each_with: FamilyMember
+          association :spouse,   with: FamilyMember
         end)
       end
 
@@ -94,6 +106,10 @@ describe "Property child associations" do
         subject {
           ParentDecorator.new(source)
         }
+
+        it 'exposes and shapes spouse association' do
+          expect(subject.spouse.legal_name).to eq('Sally Smith')
+        end
 
         it 'exposes and shapes children associations' do
           expect(subject.children.map(&:legal_name)).to eq(['Jimmy Smith', 'Jane Smith'])
@@ -151,7 +167,7 @@ describe "Property child associations" do
         stub_const('ChildDecorator', Class.new do
           include Shape::Base
           property :legal_name, from: :name
-          association :children, with: NestedChildDecorator
+          association :children, each_with: NestedChildDecorator
         end)
 
         stub_const('ParentDecorator', Class.new do
@@ -159,7 +175,7 @@ describe "Property child associations" do
           property :name
           property :years_of_age, from: :age
 
-          association :children, with: ChildDecorator
+          association :children, each_with: ChildDecorator
         end)
       end
 
@@ -175,6 +191,54 @@ describe "Property child associations" do
 
         it 'exposes and shapes nested children associations' do
           expect(subject.children.first.children.map(&:name)).to eq(['Suzy Smith', 'Sally Smith'])
+        end
+
+      end
+
+    end
+
+  end
+
+  context 'Given an object without relational attributes' do
+
+    let(:source) {
+      OpenStruct.new.tap do |person|
+        person.name  = 'John Smith'
+        person.age   = 34
+        person.ssn   = 123456789
+      end
+    }
+
+    context 'and Parent and FamilyMember Shape decorators' do
+
+      before do
+        stub_const('FamilyMember', Class.new do
+          include Shape::Base
+          property :name
+        end)
+
+        stub_const('ParentDecorator', Class.new do
+          include Shape::Base
+          property :name
+          property :years_of_age, from: :age
+
+          association :children, each_with: FamilyMember
+          association :spouse,   with: FamilyMember
+        end)
+      end
+
+      context 'when shaped by the decorator' do
+
+        subject {
+          ParentDecorator.new(source)
+        }
+
+        it 'exposes empty each_with associations as an empty array' do
+          expect(subject.children).to eq([])
+        end
+
+        it 'exposes empty with associations as nil' do
+          expect(subject.spouse).to eq(nil)
         end
 
       end

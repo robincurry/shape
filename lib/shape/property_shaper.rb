@@ -48,14 +48,22 @@ module Shape
     end
 
     def with(&block)
-      options[:with] = Class.new do
+      define_block(:with, &block)
+    end
+
+    def each_with(&block)
+      define_block(:each_with, &block)
+    end
+
+    protected
+
+    def define_block(type, &block)
+      options[type] = Class.new do
         include Shape
         instance_eval(&block)
       end
       define_accessor(name, options[:from] || name)
     end
-
-    protected
 
     def define_accessor(name, source_name)
       if !shaper_context.method_defined?(name.to_sym)
@@ -74,12 +82,10 @@ module Shape
                 raise
               end
           end
-          if with = _options[:with]
-            if result.respond_to?(:join)
-              with.shape_collection(result, parent: self)
-            else
-              with.shape(result, parent: self)
-            end
+          if !result.nil? && with = _options[:with]
+            with.shape(result, parent: self)
+          elsif each_with = _options[:each_with]
+            each_with.shape_collection(result, parent: self)
           else
             result
           end

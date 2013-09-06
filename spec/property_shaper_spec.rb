@@ -68,7 +68,10 @@ describe Shape::PropertyShaper do
           {
             name: 'Jane Smith'
           }
-        ]
+        ],
+        spouse: {
+          name: 'Sally Smith'
+        }
       }
     end
 
@@ -105,7 +108,7 @@ describe Shape::PropertyShaper do
 
     end
 
-    context 'and a Shape decorator property with with: option' do
+    context 'and a Shape decorator property with each_with: option' do
 
       before do
         stub_const('ChildDecorator', Class.new do
@@ -115,7 +118,7 @@ describe Shape::PropertyShaper do
 
         stub_const('MockDecorator', Class.new do
           include Shape::Base
-          property :children, with: ChildDecorator
+          property :children, each_with: ChildDecorator
         end)
 
       end
@@ -134,7 +137,37 @@ describe Shape::PropertyShaper do
 
     end
 
-    context 'and a Shape decorator property with with: and from: options' do
+
+    context 'and a Shape decorator property with with: option' do
+
+      before do
+        stub_const('SpouseDecorator', Class.new do
+          include Shape::Base
+          property :name
+        end)
+
+        stub_const('MockDecorator', Class.new do
+          include Shape::Base
+          property :spouse, with: SpouseDecorator
+        end)
+
+      end
+
+      context 'when shaped by the decorator' do
+
+        subject {
+          MockDecorator.new(source)
+        }
+
+        it 'exposes and shapes child element of the property with the provided decorator' do
+          expect(subject.spouse.name).to eq('Sally Smith')
+        end
+
+      end
+
+    end
+
+    context 'and a Shape decorator property with each_with: and from: options' do
 
       before do
         stub_const('ChildDecorator', Class.new do
@@ -144,7 +177,7 @@ describe Shape::PropertyShaper do
 
         stub_const('MockDecorator', Class.new do
           include Shape::Base
-          property :dependents, from: :children, with: ChildDecorator
+          property :dependents, from: :children, each_with: ChildDecorator
         end)
 
       end
@@ -163,7 +196,7 @@ describe Shape::PropertyShaper do
 
     end
 
-    context 'and a Shape decorator property with with: and from: options and a decorator defined method' do
+    context 'and a Shape decorator property with each_with: and from: options and a decorator defined method' do
 
       before do
         stub_const('ChildDecorator', Class.new do
@@ -173,7 +206,7 @@ describe Shape::PropertyShaper do
 
         stub_const('MockDecorator', Class.new do
           include Shape::Base
-          property :dependents, from: :all_children
+          property :dependents, from: :all_children, each_with: ChildDecorator
 
           def all_children
             [
@@ -203,18 +236,13 @@ describe Shape::PropertyShaper do
 
     end
 
-    context 'and a Shape decorator property using a with block' do
+    context 'and a Shape decorator property using a each_with block' do
 
       before do
-        stub_const('ChildDecorator', Class.new do
-          include Shape::Base
-          property :name
-        end)
-
         stub_const('MockDecorator', Class.new do
           include Shape::Base
           property :children do
-            with do
+            each_with do
               property :name
             end
           end
@@ -236,18 +264,42 @@ describe Shape::PropertyShaper do
 
     end
 
-    context 'and a Shape decorator property using from: option and a with block' do
+    context 'and a Shape decorator property using a with block' do
 
       before do
-        stub_const('ChildDecorator', Class.new do
+        stub_const('MockDecorator', Class.new do
           include Shape::Base
-          property :name
+          property :spouse do
+            with do
+              property :name
+            end
+          end
         end)
 
+      end
+
+      context 'when shaped by the decorator' do
+
+        subject {
+          MockDecorator.new(source)
+        }
+
+        it 'exposes and shapes the child element of the property with the provided decorator' do
+          expect(subject.spouse.name).to eq('Sally Smith')
+        end
+
+      end
+
+    end
+
+
+    context 'and a Shape decorator property using from: option and a each_with block' do
+
+      before do
         stub_const('MockDecorator', Class.new do
           include Shape::Base
           property :dependents, from: :children do
-            with do
+            each_with do
               property :name
             end
           end
@@ -263,6 +315,34 @@ describe Shape::PropertyShaper do
 
         it 'exposes and shapes each child element of the property with the provided decorator' do
           expect(subject.dependents.map(&:name)).to eq(['Jimmy Smith', 'Jane Smith'])
+        end
+
+      end
+
+    end
+
+    context 'and a Shape decorator property using from: option and a with block' do
+
+      before do
+        stub_const('MockDecorator', Class.new do
+          include Shape::Base
+          property :wife, from: :spouse do
+            with do
+              property :name
+            end
+          end
+        end)
+
+      end
+
+      context 'when shaped by the decorator' do
+
+        subject {
+          MockDecorator.new(source)
+        }
+
+        it 'exposes and shapes the child element of the property with the provided decorator' do
+          expect(subject.wife.name).to eq('Sally Smith')
         end
 
       end
