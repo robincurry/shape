@@ -63,11 +63,12 @@ module Shape
         self.from do
           return nil unless _source
           result = begin
-            _source.send(source_name)
+            _source_object = (name == source_name ? _source : self)
+            _source_object.send(source_name)
             rescue NoMethodError
-              # If source doesn't have a corresponding method, try accessing it
-              # via element accessor.
               if _source.respond_to?(:[])
+                # If no corresponding method found, try accessing it
+                # via element accessor on the source.
                 _source.send(:[], source_name)
               else
                 raise
