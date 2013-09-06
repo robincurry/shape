@@ -65,7 +65,7 @@ describe Shape::Base do
           property :name
           property :years_of_age, from: :age
 
-          association :children, with: ChildDecorator
+          association :children, each_with: ChildDecorator
         end)
       end
 
@@ -149,7 +149,7 @@ describe Shape::Base do
           property :name
           property :years_of_age, from: :age
 
-          association :children, with: ChildDecorator
+          association :children, each_with: ChildDecorator
         end)
       end
 
