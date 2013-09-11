@@ -77,7 +77,7 @@ module Shape
               if _source.respond_to?(:[])
                 # If no corresponding method found, try accessing it
                 # via element accessor on the source.
-                _source.send(:[], source_name)
+                _source.send(:[], source_name.to_sym) || _source.send(:[], source_name.to_s)
               else
                 raise
               end

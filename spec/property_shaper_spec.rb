@@ -351,4 +351,60 @@ describe Shape::PropertyShaper do
 
   end
 
+  context 'Given a hash with string attributes' do
+
+    let(:source) do
+      {
+        'name' => 'John Smith',
+        'age' => 34,
+        'ssn' => 123456789,
+        'children' => [
+          {
+            'name' => 'Jimmy Smith'
+          },
+          {
+            'name' => 'Jane Smith'
+          }
+        ],
+        'spouse' => {
+          'name' => 'Sally Smith'
+        }
+      }
+    end
+
+    context 'and a Shape decorator' do
+
+      before do
+        stub_const('MockDecorator', Class.new do
+          include Shape::Base
+          property :name
+          property :years_of_age, from: :age
+        end)
+
+      end
+
+      context 'when shaped by the decorator' do
+
+        subject {
+          MockDecorator.new(source)
+        }
+
+        it 'exposes defined properties from source' do
+          expect(subject.name).to eq('John Smith')
+        end
+
+        it 'exposes defined properties renamed from source' do
+          expect(subject.years_of_age).to eq(34)
+        end
+
+        it 'does not expose unspecified attributes' do
+          expect(subject).to_not respond_to(:ssn)
+          expect(subject).to_not respond_to(:age)
+        end
+      end
+
+    end
+
+  end
+
 end
