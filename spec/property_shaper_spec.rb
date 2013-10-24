@@ -349,6 +349,45 @@ describe Shape::PropertyShaper do
 
     end
 
+
+    context 'given nested decorated properties' do
+
+      before do
+        stub_const('MockDecorator', Class.new do
+          include Shape
+          property :dependents do
+            property :spouse
+            property :children
+          end
+        end)
+      end
+
+      context 'when shaped by the decorator' do
+
+        subject {
+          MockDecorator.new(source)
+        }
+
+        it 'exposes the nested properties' do
+          expect(subject.to_hash[:dependents]).to eq({
+            spouse: {
+              name: 'Sally Smith'
+            },
+            children: [
+              {
+                name: 'Jimmy Smith'
+              },
+              {
+                name: 'Jane Smith'
+              }
+            ]
+          })
+        end
+
+      end
+
+    end
+
   end
 
   context 'Given a hash with string attributes' do
