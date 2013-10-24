@@ -13,7 +13,10 @@ module Shape
 
     def data_visitor(properties = self.properties_to_visit, visitor = lambda {|x| x})
       properties.each_with_object({}) do |(name, property), obj|
-        if property.options.present? && (property.options[:with] || property.options[:each_with])
+
+        if property.properties.present?
+            obj[name] = self.data_visitor(property.properties, visitor)
+        elsif property.options.present? && (property.options[:with] || property.options[:each_with])
           result = self.send(name)
           if result.respond_to?(:visit)
             obj[name] = result.visit(visitor)
