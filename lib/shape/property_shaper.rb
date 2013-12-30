@@ -72,15 +72,13 @@ module Shape
           return nil unless _source
           result = begin
             _source_object = (name == source_name ? _source : self)
-            _source_object.send(source_name)
-            rescue NoMethodError
-              if _source.respond_to?(:[])
-                # If no corresponding method found, try accessing it
-                # via element accessor on the source.
-                _source.send(:[], source_name.to_sym) || _source.send(:[], source_name.to_s)
-              else
-                raise
-              end
+
+            if _source_object.respond_to?(source_name)
+              _source_object.send(source_name)
+            elsif _source.respond_to?(:[])
+              _source.send(:[], source_name.to_sym) || _source.send(:[], source_name.to_s)
+            end
+
           end
           if !result.nil? && with = _options[:with]
             with.shape(result, parent: self)
