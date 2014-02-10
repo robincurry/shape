@@ -20,7 +20,7 @@ module Shape
           result = self.send(name)
           if result.respond_to?(:visit)
             obj[name] = result.visit(visitor)
-          elsif result.is_a?(Enumerable)
+          elsif result.is_a?(Array)
             obj[name] = result.each_with_object([]) do |item, results|
               results << item.visit(visitor)
             end

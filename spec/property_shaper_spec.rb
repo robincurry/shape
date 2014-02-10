@@ -444,6 +444,43 @@ describe Shape::PropertyShaper do
 
     end
 
+    context 'and a Shape decorator property with with: option and a from block' do
+
+      before do
+        stub_const('ChildDecorator', Class.new do
+          include Shape
+          property :fullname, from: :name
+        end)
+
+        stub_const('MockDecorator', Class.new do
+          include Shape
+          property :first_child, with: ChildDecorator do
+            from do
+              _source['children'].first
+            end
+          end
+        end)
+
+      end
+
+      context 'when shaped by the decorator' do
+
+        subject {
+          MockDecorator.new(source)
+        }
+
+        it 'exposes and shapes each child element of the property with the provided decorator' do
+          expect(subject.first_child.fullname).to eq('Jimmy Smith')
+        end
+
+        specify do
+          expect(subject.to_hash).to eq({first_child: {fullname: 'Jimmy Smith'}})
+        end
+
+      end
+
+    end
+
   end
 
 end

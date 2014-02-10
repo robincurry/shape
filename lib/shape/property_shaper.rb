@@ -42,6 +42,16 @@ module Shape
     end
 
     def from(&block)
+      if with = options[:with]
+        define_from do
+          with.shape(instance_eval(&block))
+        end
+      else
+        define_from(&block)
+      end
+    end
+
+    def define_from(&block)
       unless shaper_context.method_defined?(name.to_sym)
         shaper_context.send(:define_method, name, &block)
       end
@@ -68,7 +78,7 @@ module Shape
     def define_accessor(name, source_name)
       if !shaper_context.method_defined?(name.to_sym)
         _options = self.options
-        self.from do
+        self.define_from do
           return nil unless _source
           result = begin
             _source_object = (name == source_name ? _source : self)
