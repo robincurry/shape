@@ -72,7 +72,7 @@ module Shape
       #   property :practices, with: PracticeDecorator, context: {view: :summary}
       #
       def property(property_name, options={}, &block)
-        properties[property_name] = Shape::PropertyShaper.new(
+        properties[property_name.to_sym] = Shape::PropertyShaper.new(
           shaper_context, property_name, options, &block
         )
       end
