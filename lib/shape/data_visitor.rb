@@ -13,9 +13,10 @@ module Shape
 
     def data_visitor(properties = self.properties_to_visit, visitor = lambda {|x| x})
       properties.each_with_object({}) do |(name, property), obj|
+        next unless visitable?(property)
 
         if property.properties.present?
-            obj[name] = self.data_visitor(property.properties, visitor)
+          obj[name] = self.data_visitor(property.properties, visitor)
         elsif property.options.present? && (property.options[:with] || property.options[:each_with])
           result = self.send(name)
           if result.respond_to?(:visit)
@@ -31,6 +32,11 @@ module Shape
           obj[name] = visitor.call(self.send(name))
         end
       end
+    end
+
+    def visitable?(property)
+      conditional = property.options.fetch(:if, true)
+      conditional.is_a?(Proc) ? instance_exec(&conditional) : conditional
     end
 
   end
