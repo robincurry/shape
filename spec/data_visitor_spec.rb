@@ -106,6 +106,51 @@ describe Shape::DataVisitor do
         end
       end
 
+      context 'and a Shape decorator property with if: option' do
+
+        before do
+          stub_const('MockDecorator', Class.new do
+            include Shape
+            property :name
+            property :ssn , if: ->{ _source[:secure] }
+          end)
+
+        end
+
+        context 'when false' do
+
+          before do
+            source.secure = false
+          end
+
+          subject {
+            MockDecorator.new(source)
+          }
+
+          it 'does not include the property' do
+            expect(subject.to_json).not_to include('ssn')
+          end
+
+        end
+
+        context 'when true' do
+
+          before do
+            source.secure = true
+          end
+
+          subject {
+            MockDecorator.new(source)
+          }
+
+          it 'includes the property' do
+            expect(subject.to_json).to include('ssn')
+          end
+
+        end
+
+      end
+
     end
 
   end
