@@ -8,13 +8,15 @@ module Shape
   protected
 
     def properties_to_visit
+      all_properties.select { |_, property| visitable?(property) }
+    end
+
+    def all_properties
       self.class.properties.merge(self.properties)
     end
 
     def data_visitor(properties = self.properties_to_visit, visitor = lambda {|x| x})
       properties.each_with_object({}) do |(name, property), obj|
-        next unless visitable?(property)
-
         if property.properties.present?
           obj[name] = self.data_visitor(property.properties, visitor)
         elsif property.options.present? && (property.options[:with] || property.options[:each_with])
