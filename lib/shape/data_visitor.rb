@@ -15,7 +15,7 @@ module Shape
       self.class.properties.merge(self.properties)
     end
 
-    def data_visitor(properties = self.properties_to_visit, visitor = lambda {|x| x})
+    def data_visitor(properties, visitor)
       properties.each_with_object({}) do |(name, property), obj|
         if property.properties.present?
           obj[name] = self.data_visitor(property.properties, visitor)
