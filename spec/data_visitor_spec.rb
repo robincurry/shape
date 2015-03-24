@@ -113,6 +113,10 @@ describe Shape::DataVisitor do
             include Shape
             property :name
             property :ssn , if: ->{ _source[:secure] }
+
+            property :private do
+              property :age, if: -> { _source[:secure] }
+            end
           end)
 
         end
@@ -131,6 +135,10 @@ describe Shape::DataVisitor do
             expect(subject.to_json).not_to include('ssn')
           end
 
+          it 'does not include the nested property' do
+            expect(subject.to_json).not_to include('age')
+          end
+
         end
 
         context 'when true' do
@@ -145,6 +153,10 @@ describe Shape::DataVisitor do
 
           it 'includes the property' do
             expect(subject.to_json).to include('ssn')
+          end
+
+          it 'includes the nested property' do
+            expect(subject.to_json).to include('age')
           end
 
         end
