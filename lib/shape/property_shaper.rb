@@ -93,7 +93,7 @@ module Shape
           if !result.nil? && with = _options[:with]
             with.shape(result, parent: self)
           elsif each_with = _options[:each_with]
-            each_with.shape_collection(result, parent: self)
+            each_with.shape_collection(result, parent: self, sort_by: _options[:sort_by])
           else
             result
           end
