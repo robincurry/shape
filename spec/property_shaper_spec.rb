@@ -135,6 +135,29 @@ describe Shape::PropertyShaper do
 
       end
 
+      context 'and a sort_by: option' do
+
+        before do
+          stub_const('MockDecorator', Class.new do
+            include Shape::Base
+            property :children, each_with: ChildDecorator, sort_by: :name
+          end)
+        end
+
+        context 'when shaped by the decorator' do
+
+          subject {
+            MockDecorator.new(source)
+          }
+
+          it 'sorts, exposes, and shapes each child element of the property with the provided decorator' do
+            expect(subject.children.map(&:name)).to eq(['Jane Smith', 'Jimmy Smith'])
+          end
+
+        end
+
+      end
+
     end
 
 

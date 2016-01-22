@@ -105,13 +105,19 @@ module Shape
         super *methods, options.reverse_merge(to: :_source)
       end
 
-      def shape_collection(collection, options = {})
+      def shape_collection(collection, sort_by: nil, **options)
+        raw_shaped_collection(collection, options).tap do |c|
+          c.sort_by! { |i| i.send(sort_by) } if sort_by
+        end
+      end
+
+    protected
+      def raw_shaped_collection(collection, options)
         Array(collection).map do |item|
           self.shape(item, options.clone)
         end
       end
 
-    protected
       def delegate_property(name)
         if !shaper_context.method_defined?(name)
           shaper_context.delegate(name)
