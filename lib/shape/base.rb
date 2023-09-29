@@ -100,9 +100,8 @@ module Shape
       #   to make `:_source` the default delegation target.
       #
       #   @return [void]
-      def delegate(*methods)
-        options = methods.extract_options!
-        super *methods, options.reverse_merge(to: :_source)
+      def delegate(*methods, to: :_source)
+        super(*methods, to: to)
       end
 
       def shape_collection(collection, sort_by: nil, **options)
